@@ -1,0 +1,12 @@
+{
+  "alphabet" : "23456789bcdfghjkmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ-_",
+  "domain" : "http://shrl.me",
+  "mysql" : {
+    "enabled": 0,
+    "host": "localhost",
+    "user": "root",
+    "password": "",
+    "database": "shrlme",
+    "table": "shrlme"
+  }
+}

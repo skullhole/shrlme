@@ -1,0 +1,25 @@
+{
+  "name": "shrlme",
+  "version": "1.0.0",
+  "description": "SHRL.ME - Shortening Service",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/skullhole/shrlme.git"
+  },
+  "author": "dyachenko.oleg@gmail.com",
+  "license": "ISC",
+  "homepage": "https://github.com/skullhole/shrlme/",
+  "dependencies": {
+    "express": "^4.15.2",
+    "mysql": "^2.13.0"
+  },
+  "devDependencies": {
+    "config": "^1.26.1",
+    "url": "^0.11.0",
+    "valid-url": "^1.0.9"
+  }
+}
