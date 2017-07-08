@@ -107,13 +107,11 @@ app.use(function (req, res, next) {
   };
 
   // Parse URL.
-  var query = require('url').parse(req.url, true).query;
-  console.log(query);
+  var path = req.path
+    , query = require('url').parse(req.url, true).query;
 
-  /**
-   * Encode.
-   */
-  if (!!query.q) {
+  // Encode.
+  if ((0 === path.indexOf('/get/')) && !!query.q) {
     url = query.q;
 
     if (validURL.isUri(url)) {
@@ -146,10 +144,8 @@ app.use(function (req, res, next) {
     }
   }
 
-  /**
-   * Decode.
-   */
-  else {
+  // Decode.
+  else if (path.length > 1) {
     // Hash.
     hash = req.path.substr(1);
 
@@ -164,13 +160,20 @@ app.use(function (req, res, next) {
 
     // Query.
     mysqlc.query('SELECT url FROM ' + table + ' WHERE id = ? LIMIT 1', [id], function (error, results, fields) {
-      if (error) {
+      if (error || (results.length === 0)) {
         reqSendError();
       }
       else {
         res.redirect(results[0].url);
       }
     });
+  }
+
+  //
+  else {
+    // Return.
+    res.status(500);
+    res.send("Use /get/?q=%URL% to create a short URL.");
   }
 });
 
