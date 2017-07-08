@@ -100,10 +100,19 @@ app.use(function (req, res, next) {
   /**
    *
    */
-  var reqSendError = function () {
+  var reqSendError = function (message) {
     // Return.
     res.status(500);
-    res.send("'" + url + "' resulted in error.");
+    res.send(message);
+  };
+
+  /**
+   *
+   */
+  var reqSendHelp = function () {
+    // Return.
+    res.status(500);
+    res.send("Use /get/?q=%URL% to create a short URL.");
   };
 
   // Parse URL.
@@ -111,36 +120,44 @@ app.use(function (req, res, next) {
     , query = require('url').parse(req.url, true).query;
 
   // Encode.
-  if ((0 === path.indexOf('/get/')) && !!query.q) {
-    url = query.q;
+  if (0 === path.indexOf('/get/')) {
+    // Q.
+    if (typeof query.q !== 'undefined') {
+      url = query.q;
 
-    if (validURL.isUri(url)) {
-      // Query.
-      mysqlc.query('SELECT id FROM ' + table + ' WHERE url = ? LIMIT 1', [url], function (error, results, fields) {
-        if (error) {
-          reqSendError();
-        }
-        else {
-          if (results.length > 0) {
-            reqSendHash(results[0].id);
+      if (validURL.isUri(url)) {
+        // Query.
+        mysqlc.query('SELECT id FROM ' + table + ' WHERE url = ? LIMIT 1', [url], function (error, results, fields) {
+          if (error) {
+            reqSendError("DB Error Code 1.");
           }
           else {
-            mysqlc.query('INSERT INTO ' + table + ' SET ?', {url: url}, function (error, results, fields) {
-              if (error) {
-                reqSendError();
-              }
-              else {
-                reqSendHash(results.insertId);
-              }
-            });
+            if (results.length > 0) {
+              reqSendHash(results[0].id);
+            }
+            else {
+              mysqlc.query('INSERT INTO ' + table + ' SET ?', {url: url}, function (error, results, fields) {
+                if (error) {
+                  reqSendError("DB Error Code 2");
+                }
+                else {
+                  reqSendHash(results.insertId);
+                }
+              });
+            }
           }
-        }
-      });
+        });
+      }
+      else {
+        // Return.
+        res.status(500);
+        res.send("'" + url + "' is not a valid URL.");
+      }
     }
+
+    // Help.
     else {
-      // Return.
-      res.status(500);
-      res.send("'" + url + "' is not a valid URL.");
+      reqSendHelp();
     }
   }
 
@@ -154,14 +171,17 @@ app.use(function (req, res, next) {
 
     // Validate.
     if (!id) {
-      reqSendError();
+      reqSendError("'" + hash + "' is not known short code.");
       return;
     }
 
     // Query.
     mysqlc.query('SELECT url FROM ' + table + ' WHERE id = ? LIMIT 1', [id], function (error, results, fields) {
-      if (error || (results.length === 0)) {
-        reqSendError();
+      if (error) {
+        reqSendError("DB Error Code 3");
+      }
+      else if (results.length === 0) {
+        reqSendError("DB Error Code 4");
       }
       else {
         res.redirect(results[0].url);
@@ -169,11 +189,9 @@ app.use(function (req, res, next) {
     });
   }
 
-  //
+  // Help.
   else {
-    // Return.
-    res.status(500);
-    res.send("Use /get/?q=%URL% to create a short URL.");
+    reqSendHelp();
   }
 });
 
