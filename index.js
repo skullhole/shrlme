@@ -12,7 +12,7 @@ var config = require('config');
 console.log(config);
 
 // Port
-app.set('port', process.env.PORT || 3000);
+app.set('port', process.env.PORT || config.get('port') || 3000);
 
 // MySQL.
 var mysql = require('mysql');
@@ -107,11 +107,14 @@ app.use(function (req, res, next) {
     res.send("'" + url + "' resulted in error.");
   };
 
+  // Parse URL.
+  var query = require('url').parse(req.url, true).query;
+
   /**
    * Encode.
    */
-  if (0 === req.path.indexOf('/get/')) {
-    url = req.path.substr(5);
+  if (!!query.q) {
+    url = query.q;
 
     if (validURL.isUri(url)) {
       // Query.
