@@ -171,7 +171,7 @@ app.use(function (req, res, next) {
 
     // Validate.
     if (!id) {
-      reqSendError("'" + hash + "' is not known short code.");
+      reqSendError("'" + hash + "' is not a valid short code.");
       return;
     }
 
@@ -181,7 +181,7 @@ app.use(function (req, res, next) {
         reqSendError("DB Error Code 3");
       }
       else if (results.length === 0) {
-        reqSendError("DB Error Code 4");
+        reqSendError("'" + hash + "' is not known short code.");
       }
       else {
         res.redirect(results[0].url);
