@@ -1,8 +1,7 @@
 var express = require('express')
   , app = express()
   , router = require('express').Router()
-  , validURL = require('valid-url')
-  , mongoose = require('mongoose');
+  , validURL = require('valid-url');
 
 // Root directory.
 global.__base = __dirname;
