@@ -108,6 +108,7 @@ app.use(function (req, res, next) {
 
   // Parse URL.
   var query = require('url').parse(req.url, true).query;
+  console.log(query);
 
   /**
    * Encode.
